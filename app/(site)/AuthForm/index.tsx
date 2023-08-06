@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { BsGithub, BsGoogle } from "react-icons/bs";
 
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
+import axios from "axios";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -37,6 +38,7 @@ const AuthForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setLoading(true);
     if (variant === "REGISTER") {
+      axios.post("/api/register", data);
     }
 
     if (variant === "LOGIN") {
@@ -64,7 +66,7 @@ const AuthForm = () => {
             label="Email"
             register={register}
             type="email"
-            id="Email address"
+            id="email"
             errors={errors}
             disabled={isLoading}
           />
