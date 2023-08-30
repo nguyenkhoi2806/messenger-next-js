@@ -17,8 +17,9 @@ const DesktopSideBar = () => {
               key={item?.label}
               href={item?.href}
               label={item?.label}
+              active={item?.active}
               icon={item?.icon}
-              onClist={item?.onClick}
+              onClick={item?.onClick}
             />
           ))}
         </ul>
