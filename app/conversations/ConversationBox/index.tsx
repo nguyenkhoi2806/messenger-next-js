@@ -80,8 +80,7 @@ const ConversationBox = (props: ConversationBoxProps) => {
           </div>
           <p
             className={clsx(
-              `
-            truncate
+              `truncate
             text-sm
           `,
               hasSeen ? "text-gray-500" : "text-black font-medium"
