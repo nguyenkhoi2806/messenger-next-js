@@ -5,6 +5,7 @@ import { FullMessageType } from "@/app/types";
 import { clsx } from "clsx";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 interface MessageBoxProps {
   isLast: boolean;
@@ -41,7 +42,19 @@ const MessageBox = (props: MessageBoxProps) => {
         <div className="text-xs text-gray-400">
           {format(new Date(data?.createdAt), "p")}
         </div>
-        <div className={message}>{data.body}</div>
+        <div className={message}>
+          {data.image ? (
+            <Image
+              src={data.image}
+              alt={data.image}
+              width="288"
+              height="288"
+              className="object-cover cursor-pointer hover:scale-110 transition translate"
+            />
+          ) : (
+            <div>{data.body}</div>
+          )}
+        </div>
       </div>
     </div>
   );
