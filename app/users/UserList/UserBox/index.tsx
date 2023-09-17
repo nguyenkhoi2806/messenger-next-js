@@ -19,7 +19,7 @@ const UserBox = (props: UserBoxProps) => {
   const handleClick = useCallback(() => {
     setLoading(true);
     axios
-      .post("/api/conversation", {
+      .post("/api/conversations", {
         userId: data.id,
       })
       .then((data) => {
