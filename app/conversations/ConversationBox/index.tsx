@@ -9,6 +9,7 @@ import { FullConversationType } from "@/app/types";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import { useRouter } from "next/navigation";
 import Avatar from "@/app/components/Avatar";
+import AvatarGroup from "@/app/components/AvatarGroup";
 
 interface ConversationBoxProps {
   data: FullConversationType;
@@ -22,7 +23,7 @@ const ConversationBox = (props: ConversationBoxProps) => {
   const router = useRouter();
 
   const handleClick = useCallback(() => {
-    router.push("conversations/" + data.id);
+    router.push("/conversations/" + data.id);
   }, [router, data.id]);
 
   const lastMessage = useMemo(() => {
@@ -60,12 +61,12 @@ const ConversationBox = (props: ConversationBoxProps) => {
   return (
     <div
       className={clsx(
-        "w-ful relative flex items-center space-x-3 p-3 hover:bg-neutral-100 rounded-lg transition-all cursor-pointer",
-        selected ? "bg-neutral-100" : "bg-white"
+        'w-ful relative flex items-center space-x-3 p-3 hover:bg-neutral-100 rounded-lg transition-all cursor-pointer',
+        selected ? 'bg-neutral-100' : 'bg-white',
       )}
       onClick={handleClick}
     >
-      <Avatar user={otherUser} />
+      {data.isGroup ? <AvatarGroup users={data.users} /> : <Avatar user={otherUser} />}
       <div className="min-w-0 flex-1">
         <div className="focus:outline-none">
           <div className="flex justify-between items-center mb-1">
@@ -74,7 +75,7 @@ const ConversationBox = (props: ConversationBoxProps) => {
             </p>
             {lastMessage?.createdAt && (
               <p className="text-xs text-gray-400 font-light ">
-                {format(new Date(lastMessage.createdAt), "p")}
+                {format(new Date(lastMessage.createdAt), 'p')}
               </p>
             )}
           </div>
@@ -83,7 +84,7 @@ const ConversationBox = (props: ConversationBoxProps) => {
               `truncate
             text-sm
           `,
-              hasSeen ? "text-gray-500" : "text-black font-medium"
+              hasSeen ? 'text-gray-500' : 'text-black font-medium',
             )}
           >
             {lastMessageText}
