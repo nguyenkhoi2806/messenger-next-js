@@ -1,7 +1,8 @@
-import { getCurrentUser } from "@/app/actions/getCurrentUser";
-import { NextResponse } from "next/server";
+import { getCurrentUser } from '@/app/actions/getCurrentUser';
+import { NextResponse } from 'next/server';
 
-import prisma from "@/app/libs/prismadb";
+import prisma from '@/app/libs/prismadb';
+import { pusherSever } from '@/app/libs/pusher';
 
 interface IParams {
   conversationId?: string;
@@ -13,7 +14,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
     const { conversationId } = params;
 
     if (!currentUser?.id || !currentUser.email) {
-      return new NextResponse("Unthorized", { status: 401 });
+      return new NextResponse('Unthorized', { status: 401 });
     }
     const conversation = await prisma.conversation.findUnique({
       where: {
@@ -30,7 +31,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
     });
 
     if (!conversation) {
-      return new NextResponse("Invalid Id", { status: 400 });
+      return new NextResponse('Invalid Id', { status: 400 });
     }
 
     const lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -38,7 +39,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
       return NextResponse.json(conversation);
     }
 
-    const upadateMessage = await prisma?.message.update({
+    const updateMessage = await prisma?.message.update({
       where: {
         id: lastMessage.id,
       },
@@ -55,7 +56,22 @@ export async function POST(request: Request, { params }: { params: IParams }) {
       },
     });
 
-    return NextResponse.json(upadateMessage);
+    pusherSever.trigger(currentUser.email, 'conversation:update', {
+      id: conversationId,
+      messages: [updateMessage],
+    });
+
+    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+      return NextResponse.json(conversation);
+    }
+
+    await pusherSever.trigger(
+      conversationId!,
+      'messages:update',
+      updateMessage,
+    );
+
+    return NextResponse.json(updateMessage);
   } catch (error: any) {
     return new NextResponse(error, { status: 500 });
   }

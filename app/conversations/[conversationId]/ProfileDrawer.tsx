@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Avatar from "@/app/components/Avatar";
-import useOtherUser from "@/app/hooks/useOtherUser";
-import { Transition, Dialog } from "@headlessui/react";
-import { Conversation, User } from "@prisma/client";
-import { format } from "date-fns";
-import { Fragment, useMemo, useState } from "react";
-import { IoClose, IoTrash } from "react-icons/io5";
-import ConfirmModal from "./ConfirmModal";
-import AvatarGroup from "@/app/components/AvatarGroup";
+import Avatar from '@/app/components/Avatar';
+import useOtherUser from '@/app/hooks/useOtherUser';
+import { Transition, Dialog } from '@headlessui/react';
+import { Conversation, User } from '@prisma/client';
+import { format } from 'date-fns';
+import { Fragment, useMemo, useState } from 'react';
+import { IoClose, IoTrash } from 'react-icons/io5';
+import ConfirmModal from './ConfirmModal';
+import AvatarGroup from '@/app/components/AvatarGroup';
 
 interface ProfileDrawerProps {
   data: Conversation & {
@@ -24,7 +24,7 @@ const ProfileDrawer = (props: ProfileDrawerProps) => {
   const otherUser = useOtherUser(data);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const joinedDate = useMemo(() => {
-    return format(new Date(otherUser?.createdAt || ""), "PP");
+    return format(new Date(otherUser?.createdAt || ''), 'PP');
   }, [otherUser]);
 
   const title = useMemo(() => {
@@ -35,7 +35,7 @@ const ProfileDrawer = (props: ProfileDrawerProps) => {
     if (data.isGroup) {
       return `${data.users.length} members`;
     }
-    return "Active";
+    return 'Active';
   }, [data.users, data.isGroup]);
   return (
     <>
@@ -133,6 +133,22 @@ const ProfileDrawer = (props: ProfileDrawerProps) => {
                           </div>
                           <div className="w-full pb-5 pt-5 sm:px-0 sm:pt-0">
                             <dl className="space-y-8 px-4 sm:space-y-6 sm:px-6">
+                              {data.isGroup && (
+                                <div>
+                                  <dt
+                                    className="text-sm font-medium 
+                                      text-gray-500 sm:w-40 
+                                      first-letter:sm:flex-shrink-0"
+                                  >
+                                    Emails
+                                  </dt>
+                                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
+                                    {data.users
+                                      .map((user) => user.email)
+                                      .join(', ')}
+                                  </dd>
+                                </div>
+                              )}
                               {!data.isGroup && (
                                 <div>
                                   <dt className="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
@@ -151,9 +167,7 @@ const ProfileDrawer = (props: ProfileDrawerProps) => {
                                       Joined
                                     </dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
-                                      <time dataTime={joinedDate}>
-                                        {joinedDate}
-                                      </time>
+                                      <time>{joinedDate}</time>
                                     </dd>
                                   </div>
                                 </>
