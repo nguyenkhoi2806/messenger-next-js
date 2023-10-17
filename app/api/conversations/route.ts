@@ -1,7 +1,8 @@
-import { getCurrentUser } from "@/app/actions/getCurrentUser";
-import { NextResponse } from "next/server";
-import prisma from "@/app/libs/prismadb";
-import { connect } from "http2";
+import { getCurrentUser } from '@/app/actions/getCurrentUser';
+import { NextResponse } from 'next/server';
+import prisma from '@/app/libs/prismadb';
+import { connect } from 'http2';
+import { pusherSever } from '@/app/libs/pusher';
 
 export async function POST(request: Request) {
   try {
@@ -10,10 +11,10 @@ export async function POST(request: Request) {
     const { userId, isGroup, members, name } = body;
 
     if (!currentUser?.id || !currentUser?.email) {
-      return new NextResponse("Unthorized", { status: 401 });
+      return new NextResponse('Unthorized', { status: 401 });
     }
     if (isGroup && (!members || members.length < 2 || !name)) {
-      return new NextResponse("Invalid data", { status: 400 });
+      return new NextResponse('Invalid data', { status: 400 });
     }
 
     if (isGroup) {
@@ -36,6 +37,13 @@ export async function POST(request: Request) {
           users: true,
         },
       });
+
+      newConversation.users.forEach((user) => {
+        if (user.email) {
+          pusherSever.trigger(user.email, 'conversation:new', newConversation);
+        }
+      });
+
       return NextResponse.json(newConversation);
     }
 
@@ -77,8 +85,15 @@ export async function POST(request: Request) {
         users: true,
       },
     });
+
+    newConversation.users.map((user) => {
+      if (user.email) {
+        pusherSever.trigger(user.email, 'conversation:new', newConversation);
+      }
+    });
+
     return NextResponse.json(newConversation);
   } catch (error: any) {
-    return new NextResponse("Internal Error", { status: 500 });
+    return new NextResponse('Internal Error', { status: 500 });
   }
 }
